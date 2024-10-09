@@ -39,9 +39,14 @@ const register = async (req, res, next) => {
     email,
     password: hashedPassword,
     role,
+    avatar: request.file.filename,
   });
 
-  const token = await generateJWT({ email: newUser.email, id: newUser._id });
+  const token = await generateJWT({
+    email: newUser.email,
+    id: newUser._id,
+    role: newUser.role,
+  });
   newUser.token = token;
 
   await newUser.save();
@@ -55,14 +60,13 @@ const register = async (req, res, next) => {
 const login = async (req, res, next) => {
   const { email, password } = req.body;
 
-  // Check if user exists
   const userFound = await User.findOne({ email }).select("+password");
   if (!userFound) {
     return next(new appError("User not found", 404, httpStatusText.FAIL));
   }
 
   const passwordStr = String(password);
-  // Compare password with the hashed password in the database
+
   const isMatch = await bcrypt.compare(passwordStr, userFound.password);
   if (!isMatch) {
     return next(new appError("Incorrect password", 401, httpStatusText.FAIL));
@@ -71,8 +75,9 @@ const login = async (req, res, next) => {
   const token = await generateJWT({
     email: userFound.email,
     id: userFound._id,
+    role: userFound.role,
   });
-  // If login is successful
+
   res.status(200).json({
     status: httpStatusText.SUCCESS,
     message: "User logged in successfully",

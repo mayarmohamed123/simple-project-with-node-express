@@ -36,6 +36,10 @@ const userSchema = new mongoose.Schema({
     enum: [userRole.ADMIN, userRole.USER, userRole.MANAGER],
     default: userRole.USER,
   },
+  avatar: {
+    type: String,
+    default: "../uploads/user-1.png", // default avatar image when no image uploaded by user.
+  },
 });
 
 const User = mongoose.model("User", userSchema);

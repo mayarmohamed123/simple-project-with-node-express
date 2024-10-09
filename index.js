@@ -4,6 +4,7 @@ const app = express();
 const mongoose = require("mongoose");
 const cors = require("cors");
 const httpStatusText = require("./utils/httpStatusText");
+const path = require("path");
 
 const url = process.env.MONGO_URL;
 const coursesRouter = require("./routes/courses.routes");
@@ -22,6 +23,7 @@ mongoose
   });
 
 // Routing
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 app.use("/api/courses", coursesRouter);
 app.use("/api/users", usersRouter);
 
